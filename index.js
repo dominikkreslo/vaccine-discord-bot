@@ -40,7 +40,33 @@ function getAvailability(stores) {
     );
   }
 
-  Promise.all(promises).then((res)=>{
-    let available[]
-  })
+  Promise.all(promises)
+    .then((res) => {
+      let available = [];
+
+      res.map((res, index) => {
+        const returnData = res.Data;
+        const locationString = `${stores[index].address}, ${stores[index].city}`;
+        if (returnData.slots["1"] || returnData.slots["2"]) {
+          console.log(locationString, "\x1b[32m", "AVAILABLE", "\x1b[0m");
+
+          available.push(locationString);
+        } else {
+          console.log(locationString, "\x1b[31m", "NOT AVAILABLE", "\x1b[0m");
+        }
+      });
+
+      if (available.length > 0) {
+      sendEmail(available);
+      }
+      return;
+    })
+    .catch((err) => {
+      console.error(err);
+    })
+    .finally(() => {
+      setTimeout(() => {
+        getAvailability(stores);
+      }, sleepTime);
+    });
 }
